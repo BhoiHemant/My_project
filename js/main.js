@@ -2,7 +2,8 @@
 (function(){
   const $ = (sel,scope=document)=>scope.querySelector(sel);
   const $$ = (sel,scope=document)=>Array.from(scope.querySelectorAll(sel));
-  const BASE_URL = 'http://localhost:5000';
+  // Live backend API base URL
+  const API_BASE = (window.API_BASE && String(window.API_BASE)) || 'https://vaidya-ihc9.onrender.com';
   const TOKEN_KEY = 'auth_token';
   const USER_KEY = 'auth_user';
 
@@ -16,7 +17,7 @@
     const token = getToken();
     const headers = Object.assign({ 'Content-Type': 'application/json' }, options.headers||{});
     if(token){ headers['Authorization'] = `Bearer ${token}`; }
-    const res = await fetch(`${BASE_URL}${path}`, Object.assign({}, options, { headers }));
+    const res = await fetch(`${API_BASE}${path}`, Object.assign({}, options, { headers }));
     if(res.status === 401){ clearAuth(); if(!window.location.pathname.endsWith('login.html')) window.location.href = 'login.html'; throw new Error('Unauthorized'); }
     let data = null; try{ data = await res.json(); }catch(_){/* no json */}
     if(!res.ok){ const msg = (data && (data.message||data.error)) || `Request failed (${res.status})`; const err = new Error(msg); err.status=res.status; err.data=data; throw err; }

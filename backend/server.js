@@ -35,16 +35,24 @@ app.use('/doctors', doctorRoutes);
 app.use('/patients', patientRoutes);
 app.use('/billing', billingRoutes);
 
-// Start server after DB initialization
+// Start server and initialize DB (do not exit on DB failure)
 const PORT = process.env.PORT || 5000;
 
 (async () => {
+  let dbReady = false;
   try {
     await initDB();
-    app.listen(PORT, async () => {
-      console.log(`✅ Server running on port ${PORT}`);
-      // Self-test runner
-      try{
+    dbReady = true;
+  } catch (err) {
+    console.error('Failed to initialize DB', err);
+  }
+  app.listen(PORT, async () => {
+    console.log(`✅ Server running on port ${PORT}`);
+    if (!dbReady) {
+      console.warn('[WARN] DB not initialized at startup; API endpoints involving DB may fail until resolved.');
+    }
+    // Self-test runner
+    try{
         if (globalThis.__ran_self_tests__) return; // run once
         globalThis.__ran_self_tests__ = true;
         if (typeof fetch !== 'function') { console.warn('[SELFTEST] fetch not available in Node runtime'); return; }
@@ -97,9 +105,5 @@ const PORT = process.env.PORT || 5000;
         // Summary
         console.log('[SELFTEST SUMMARY] ok=', results.ok.length, 'fail=', results.fail.length);
       }catch(e){ console.error('[SELFTEST] runner error:', e); }
-    });
-  } catch (err) {
-    console.error('Failed to initialize DB', err);
-    process.exit(1);
-  }
+  });
 })();

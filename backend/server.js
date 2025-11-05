@@ -15,15 +15,19 @@ dotenv.config();
 
 const app = express();
 
+// Health check
+app.get('/health', (req, res) => {
+  try {
+    res.status(200).json({ status: 'ok' });
+  } catch (err) {
+    res.status(500).json({ status: 'error', error: String(err) });
+  }
+});
+
 // Middleware
 app.use(cors()); // Enable CORS for all origins; adjust as needed
 app.use(express.json()); // Parse JSON bodies
 app.use(morgan('dev')); // HTTP request logging
-
-// Health check
-app.get('/health', (_req, res) => {
-  res.json({ status: 'ok' });
-});
 
 // Mount routes (no prefix to match requested endpoints)
 app.use('/', authRoutes);
@@ -38,7 +42,7 @@ const PORT = process.env.PORT || 5000;
   try {
     await initDB();
     app.listen(PORT, async () => {
-      console.log(`Server running on http://localhost:${PORT}`);
+      console.log(`✅ Server running on port ${PORT}`);
       // Self-test runner
       try{
         if (globalThis.__ran_self_tests__) return; // run once

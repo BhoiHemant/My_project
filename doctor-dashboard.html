@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Doctor Dashboard | Health Recharge</title>
+<link rel="stylesheet" href="css/style.css">
+</head><body>
+<header class="header"><div class="container nav">
+  <a class="brand" href="index.html"><img src="assets/images/logo.svg"/> Health Recharge</a>
+  <nav class="nav-links" id="nav-links">
+    <a href="index.html">Home</a>
+    <a href="doctors.html">Doctors</a>
+    <a href="doctor-dashboard.html" class="badge">Doctor Dashboard</a>
+    <a href="signup.html" class="btn">Sign Up</a>
+  </nav>
+  <button class="hamburger" id="hamburger">☰</button>
+</div></header>
+
+<section class="section"><div class="container">
+  <h1 class="title">Doctor Dashboard</h1>
+  <div class="grid" style="grid-template-columns:1fr 1fr;gap:16px">
+    <div class="card">
+      <h3>Edit Profile</h3>
+      <div class="form-actions" style="gap:12px;margin-bottom:8px;align-items:flex-start">
+        <img id="dd-photo-preview" src="assets/images/logo.svg" alt="Photo" style="width:84px;height:84px;object-fit:cover;border-radius:10px;border:1px solid #1f2937;background:#0b1220"/>
+        <div>
+          <label>Profile Photo</label>
+          <input id="dd-photo" type="file" accept="image/*">
+          <div class="form-actions" style="margin-top:8px;gap:8px">
+            <button class="btn secondary" id="dd-photo-remove" type="button">Remove Photo</button>
+          </div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div><label>Clinic Name</label><input id="dd-clinic" placeholder="Your Clinic"></div>
+        <div><label>Specialization</label><input id="dd-spec" placeholder="Cardiology"></div>
+      </div>
+      <label>Address</label><input id="dd-address" placeholder="Street, City">
+      <div class="form-actions" style="margin-top:12px">
+        <button class="btn" id="dd-save" type="button">Save</button>
+        <a class="btn secondary" href="doctor-profile.html">View Profile</a>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Search Patient by User ID</h3>
+      <div class="form-row"><input placeholder="User ID"><button class="btn" type="button">View Prescriptions</button></div>
+    </div>
+  </div>
+
+  <div class="grid" style="grid-template-columns:1fr 1fr;gap:16px;margin-top:16px">
+    <div class="card">
+      <h3>Recent Patients</h3>
+      <ul><li>U12345 - Rohan</li><li>U54321 - Neha</li></ul>
+    </div>
+    <div class="card">
+      <h3>Feedback Summary</h3>
+      <div class="kpi"><div class="item"><div class="num">4.7</div><div>Avg Rating</div></div><div class="item"><div class="num">320</div><div>Total Reviews</div></div></div>
+    </div>
+  </div>
+
+  <!-- Patient-wise Billing Summary -->
+  <div class="card" style="margin-top:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+      <div>
+        <div class="tag">Dashboard > Billing Summary</div>
+        <h3 style="margin-top:8px">Patient-wise Billing Summary</h3>
+      </div>
+      <div class="form-actions" style="gap:8px">
+        <button class="btn secondary" id="doc-bill-export-excel" type="button">Export Excel</button>
+        <button class="btn secondary" id="doc-bill-export-pdf" type="button">Export PDF</button>
+        <button class="btn secondary" id="doc-bill-print" type="button">Print</button>
+      </div>
+    </div>
+
+    <!-- Search by Patient User ID -->
+    <div class="form-actions" style="gap:8px;margin-top:12px">
+      <input id="bill-search-userid" placeholder="Enter Patient User ID (e.g., U12345)" style="max-width:320px">
+      <button class="btn" id="bill-search-btn" type="button">Search</button>
+      <span id="bill-search-msg" class="badge" style="display:none"></span>
+    </div>
+
+    <!-- Patient details after search -->
+    <div id="bill-patient-details" class="card" style="margin-top:12px;display:none">
+      <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <div><strong id="bp-name">-</strong><div class="muted">Name</div></div>
+        <div><strong id="bp-plan">-</strong><div class="muted">Plan</div></div>
+        <div><strong id="bp-age">-</strong><div class="muted">Age</div></div>
+        <div><strong id="bp-contact">-</strong><div class="muted">Contact</div></div>
+        <div><strong id="bp-status">-</strong><div class="muted">Active Status</div></div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="form-actions" style="gap:8px;margin-top:12px">
+      <input id="bill-table-search" placeholder="Search notes/diagnosis..." style="max-width:260px">
+      <select id="bill-filter-status" style="max-width:200px"><option value="">All Payments</option><option value="paid">Paid</option><option value="pending">Pending</option></select>
+      <select id="bill-sort" style="max-width:220px">
+        <option value="date-desc">Sort: Date (newest)</option>
+        <option value="date-asc">Sort: Date (oldest)</option>
+        <option value="amount-desc">Sort: Amount (high)</option>
+        <option value="amount-asc">Sort: Amount (low)</option>
+      </select>
+    </div>
+
+    <!-- Table -->
+    <table class="table" id="bill-table" style="margin-top:12px">
+      <thead>
+        <tr>
+          <th>Patient</th>
+          <th>Plan</th>
+          <th>Treatment Date</th>
+          <th>Diagnosis / Notes</th>
+          <th>Amount (₹)</th>
+          <th>Payment</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <!-- Add / Update Billing Entry -->
+    <form id="bill-form" class="grid" style="grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px">
+      <div>
+        <label>Patient User ID</label>
+        <input id="bf-userid" required placeholder="U12345">
+      </div>
+      <div>
+        <label>Treatment Date</label>
+        <input id="bf-date" type="date" required>
+      </div>
+      <div>
+        <label>Amount (₹)</label>
+        <input id="bf-amount" type="number" min="0" step="1" required placeholder="e.g., 1200">
+      </div>
+      <div style="grid-column:1/-1">
+        <label>Treatment Description</label>
+        <input id="bf-desc" required placeholder="Diagnosis / Notes">
+      </div>
+      <div>
+        <label>Payment Mode</label>
+        <select id="bf-mode" required><option value="cash">Cash</option><option value="upi">UPI</option><option value="card">Card</option><option value="insurance">Insurance</option></select>
+      </div>
+      <div>
+        <label>Payment Status</label>
+        <select id="bf-status" required><option value="paid">Paid</option><option value="pending">Pending</option></select>
+      </div>
+      <div>
+        <label>Additional Notes (optional)</label>
+        <input id="bf-notes" placeholder="Optional notes">
+      </div>
+      <div class="form-actions" style="grid-column:1/-1">
+        <button class="btn" id="bf-save" type="submit">Add Entry</button>
+        <button class="btn secondary" id="bf-reset" type="button">Reset</button>
+      </div>
+    </form>
+
+    <!-- Summary & Insights -->
+    <div class="kpi" style="margin-top:12px">
+      <div class="item"><div class="num" id="sum-daily">₹0</div><div>Daily Earnings</div></div>
+      <div class="item"><div class="num" id="sum-monthly">₹0</div><div>Monthly Earnings</div></div>
+      <div class="item"><div class="num" id="sum-yearly">₹0</div><div>Yearly Earnings</div></div>
+      <div class="item"><div class="num" id="sum-pending">₹0</div><div>Pending Payments</div></div>
+    </div>
+  </div>
+</div></section>
+
+<footer class="footer"><div class="container">© Health Recharge</div></footer>
+<script src="js/main.js"></script>
+</body></html>

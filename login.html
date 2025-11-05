@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login | Health Recharge</title>
+<link rel="stylesheet" href="css/style.css">
+</head><body>
+<header class="header"><div class="container nav">
+  <a class="brand" href="index.html"><img src="assets/images/logo.svg"/> Health Recharge</a>
+  <nav class="nav-links" id="nav-links">
+    <a href="index.html">Home</a>
+    <a href="plans.html">Plans</a>
+    <a href="doctors.html">Doctors</a>
+    <a href="login.html" class="badge">Login</a>
+    <a href="signup.html" class="btn">Sign Up</a>
+  </nav>
+  <button class="hamburger" id="hamburger">☰</button>
+</div></header>
+
+<section class="section"><div class="container" style="max-width:560px">
+  <h1 class="title">Login</h1>
+  <p class="lead">Email + Password login with OTP (demo). Future: secure backend + Google login.</p>
+
+  <form data-validate="simple" class="card">
+    <div class="form-msg alert" style="margin-bottom:12px"></div>
+    <label>Email</label>
+    <input type="email" name="email" placeholder="you@example.com" required>
+    <label>Password</label>
+    <input type="password" name="password" placeholder="••••••" required>
+    <div class="form-actions" style="margin-top:12px">
+      <button class="btn" type="submit">Login</button>
+      <a class="btn link" href="signup.html">New here? Sign Up</a>
+      <a class="btn link" href="#">Forgot Password</a>
+    </div>
+  </form>
+</div></section>
+
+<!-- OTP Modal (demo) -->
+<div class="modal hidden" id="otp-modal" style="position:fixed;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.5)">
+  <div class="card" style="max-width:420px">
+    <h3>OTP Verification</h3>
+    <p class="lead">OTP sent to <strong id="otp-email"></strong> (demo)</p>
+    <div class="form-row">
+      <input placeholder="Enter OTP"/>
+      <button class="btn" id="otp-verify">Verify</button>
+    </div>
+    <div style="margin-top:10px"><button class="btn secondary js-close-modal">Close</button></div>
+  </div>
+</div>
+
+<footer class="footer"><div class="container">© Health Recharge</div></footer>
+<script src="js/main.js"></script>
+</body></html>

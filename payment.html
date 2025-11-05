@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Payment | Health Recharge</title>
+<link rel="stylesheet" href="css/style.css">
+</head><body>
+<header class="header"><div class="container nav">
+  <a class="brand" href="index.html"><img src="assets/images/logo.svg"/> Health Recharge</a>
+  <nav class="nav-links" id="nav-links">
+    <a href="index.html">Home</a>
+    <a href="plans.html">Plans</a>
+    <a href="doctors.html">Doctors</a>
+    <a href="signup.html" class="btn">Sign Up</a>
+  </nav>
+  <button class="hamburger" id="hamburger">☰</button>
+</div></header>
+
+<section class="section"><div class="container" style="max-width:760px">
+  <h1 class="title">Payment / Recharge</h1>
+  <p class="lead">Demo checkout. Future: Razorpay/Stripe integration + invoice + email.</p>
+
+  <div class="card">
+    <h3>Selected Plan</h3>
+    <div class="form-row">
+      <div>
+        <label>Plan</label>
+        <select>
+          <option>Monthly - ₹299</option>
+          <option>Quarterly - ₹799</option>
+          <option>Yearly - ₹2,599</option>
+        </select>
+      </div>
+      <div>
+        <label>Coupon</label>
+        <input placeholder="Enter coupon (future)">
+      </div>
+    </div>
+  </div>
+
+  <form class="card">
+    <h3>Payment Details (Demo)</h3>
+    <div class="form-row">
+      <div><label>Cardholder Name</label><input required></div>
+      <div><label>Card Number</label><input required placeholder="4242 4242 4242 4242"></div>
+    </div>
+    <div class="form-row">
+      <div><label>Expiry</label><input required placeholder="MM/YY"></div>
+      <div><label>CVV</label><input required placeholder="123"></div>
+    </div>
+    <div class="form-actions"><button class="btn" type="button" onclick="alert('Demo payment success!')">Pay Now</button></div>
+  </form>
+</div></section>
+
+<footer class="footer"><div class="container">© Health Recharge</div></footer>
+<script src="js/main.js"></script>
+</body></html>

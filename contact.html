@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact | Health Recharge</title>
+<link rel="stylesheet" href="css/style.css">
+</head><body>
+<header class="header"><div class="container nav">
+  <a class="brand" href="index.html"><img src="assets/images/logo.svg"/> Health Recharge</a>
+  <nav class="nav-links" id="nav-links">
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="contact.html" class="badge">Contact</a>
+    <a href="signup.html" class="btn">Sign Up</a>
+  </nav>
+  <button class="hamburger" id="hamburger">☰</button>
+</div></header>
+
+<section class="section"><div class="container" style="max-width:760px">
+  <h1 class="title">Contact Support</h1>
+  <p class="lead">Have questions? Humein message bhejiye. Future: email API integration.</p>
+  <form class="card" onsubmit="event.preventDefault(); alert('Message sent (demo).');">
+    <div class="form-row">
+      <div><label>Name</label><input required></div>
+      <div><label>Email</label><input type="email" required></div>
+    </div>
+    <label>Message</label>
+    <textarea rows="5" required></textarea>
+    <div class="form-actions" style="margin-top:12px"><button class="btn" type="submit">Send</button></div>
+  </form>
+  <div class="grid" style="grid-template-columns:1fr 1fr;gap:16px;margin-top:16px">
+    <div class="card">
+      <h3>Head Office</h3>
+      <p>Vadodara, India</p>
+    </div>
+    <div class="card" style="height:220px;display:grid;place-items:center">Google Map Placeholder</div>
+  </div>
+</div></section>
+
+<footer class="footer"><div class="container"> Health Recharge</div></footer>
+<script src="js/main.js"></script>
+</body></html>

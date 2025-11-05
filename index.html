@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Health Recharge | Home</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- Header/Nav - Common across pages | Hinglish: Navbar sab pages par reuse hoga -->
+  <header class="header">
+    <div class="container nav">
+      <a class="brand" href="index.html"><img src="assets/images/logo.svg" alt="Logo"/> Health Recharge</a>
+      <nav class="nav-links" id="nav-links">
+        <a href="index.html">Home</a>
+        <a href="plans.html">Plans</a>
+        <a href="doctors.html">Doctors</a>
+        <a href="user-dashboard.html" class="badge">Dashboard</a>
+        <a href="login.html">Login</a>
+        <a href="signup.html" class="btn">Sign Up</a>
+      </nav>
+      <button class="hamburger" id="hamburger">☰</button>
+    </div>
+  </header>
+
+  <!-- Hero Section: Tagline + CTAs -->
+  <section class="hero container">
+    <div>
+      <span class="tag">Recharge Your Health, Save Your Future</span>
+      <h1>Affordable health benefits for every family</h1>
+      <p>Plans: Monthly, Quarterly, Yearly. Doctor collaborations, clinic discounts, and more. Ab healthcare simple aur budget-friendly.</p>
+      <div class="actions">
+        <a class="btn" href="plans.html">View Plans</a>
+        <a class="btn secondary" href="#nearby">Find Nearby Doctors</a>
+        <a class="btn" href="signup.html">Get Started</a>
+      </div>
+      <div class="kpi" style="margin-top:20px">
+        <div class="item"><div class="num">10k+</div><div>Active Users</div></div>
+        <div class="item"><div class="num">500+</div><div>Doctors</div></div>
+        <div class="item"><div class="num">50+</div><div>Cities</div></div>
+      </div>
+    </div>
+    <div class="preview card">
+      <img src="assets/images/family.png" alt="Preview"/>
+    </div>
+  </section>
+
+  <!-- Plans Overview -->
+  <section class="section">
+    <div class="container">
+      <h2 class="title">Quick Plans Overview</h2>
+      <p class="lead">Choose the plan that suits you. Simple pricing aur transparent benefits.</p>
+      <div class="grid plans">
+        <article class="card plan" data-duration="monthly" data-price="299">
+          <h3>Monthly</h3>
+          <div class="price">₹299</div>
+          <ul>
+            <li>OPD Discounts upto 30%</li>
+            <li>Free Follow-up (1)</li>
+            <li>Partner Labs par 10% off</li>
+          </ul>
+          <a class="btn js-buy-plan" href="payment.html">Recharge Now</a>
+        </article>
+        <article class="card plan" data-duration="quarterly" data-price="799">
+          <h3>Quarterly</h3>
+          <div class="price">₹799</div>
+          <ul>
+            <li>OPD Discounts upto 35%</li>
+            <li>Free Follow-ups (2)</li>
+            <li>Priority Support</li>
+          </ul>
+          <a class="btn js-buy-plan" href="payment.html">Recharge Now</a>
+        </article>
+        <article class="card plan" data-duration="yearly" data-price="2599">
+          <h3>Yearly</h3>
+          <div class="price">₹2,599</div>
+          <ul>
+            <li>OPD Discounts upto 40%</li>
+            <li>Free Follow-ups (5)</li>
+            <li>Full family coverage</li>
+          </ul>
+          <a class="btn js-buy-plan" href="payment.html">Recharge Now</a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Nearby Doctors Preview -->
+  <section class="section" id="nearby">
+    <div class="container">
+      <h2 class="title">Find Nearby Doctors</h2>
+      <p class="lead">Map preview (demo) – future: Google Maps integration.</p>
+      <div class="card" style="height:260px;display:grid;place-items:center">Map Placeholder</div>
+    </div>
+  </section>
+
+  <!-- Testimonials Slider -->
+  <section class="section">
+    <div class="container">
+      <h2 class="title">Loved by Users and Doctors</h2>
+      <div class="card" id="testimonial-track">
+        <div class="slide" style="display:block">“Saved 40% on clinic bills!” – Rohan, Pune</div>
+        <div class="slide" style="display:none">“Great partner program.” – Dr. Sharma</div>
+        <div class="slide" style="display:none">“Easy subscription aur instant benefits.” – Neha, Delhi</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Auth Modal -->
+  <div class="modal hidden" id="auth-modal" style="position:fixed;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.5)">
+    <div class="card" style="max-width:460px;width:92%">
+      <div id="auth-step-choose">
+        <h3>Continue to buy plan</h3>
+        <p class="lead">Please sign in or create a new account to proceed.</p>
+        <div class="form-actions" style="margin-top:12px">
+          <a class="btn" href="login.html" id="auth-signin">Sign In</a>
+          <button class="btn secondary" id="auth-signup">Sign Up</button>
+          <button class="btn secondary js-close-modal" type="button">Close</button>
+        </div>
+      </div>
+      <div id="auth-step-role" class="hidden">
+        <h3>Select Role</h3>
+        <p class="lead">Are you signing up as a Patient or a Doctor?</p>
+        <div class="form-actions" style="margin-top:12px">
+          <button class="btn" data-role="patient">Patient</button>
+          <button class="btn" data-role="doctor">Doctor</button>
+          <button class="btn secondary js-close-modal" type="button">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer - Common -->
+  <footer class="footer">
+    <div class="container cols">
+      <div>
+        <div class="brand"><img src="assets/images/logo.svg" alt="Logo"/> Health Recharge</div>
+        <p style="color:#94a3b8">Affordable preventive care for everyone.</p>
+      </div>
+      <div>
+        <strong>Quick Links</strong>
+        <div><a href="about.html">About</a></div>
+        <div><a href="contact.html">Contact</a></div>
+        <div><a href="doctors.html">Doctors</a></div>
+      </div>
+      <div>
+        <strong>Legal</strong>
+        <div><a href="#">Terms</a></div>
+        <div><a href="#">Privacy</a></div>
+      </div>
+      <div>
+        <strong>Social</strong>
+        <div><a href="#">Twitter</a></div>
+        <div><a href="#">LinkedIn</a></div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

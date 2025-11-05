@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard | Health Recharge</title>
+<link rel="stylesheet" href="css/style.css">
+</head><body>
+<header class="header"><div class="container nav">
+  <a class="brand" href="index.html"><img src="assets/images/logo.svg"/> Health Recharge</a>
+  <nav class="nav-links" id="nav-links">
+    <a href="index.html">Home</a>
+    <a href="admin-dashboard.html" class="badge">Admin</a>
+    <a href="signup.html" class="btn">Sign Up</a>
+  </nav>
+  <button class="hamburger" id="hamburger">☰</button>
+</div></header>
+
+<section class="section"><div class="container">
+  <h1 class="title">Admin Dashboard</h1>
+  <!-- Overview KPIs -->
+  <div class="grid" style="grid-template-columns:repeat(4,1fr);gap:16px">
+    <div class="kpi item"><div><div class="num" id="kpi-users">10,240</div><div>Total Users</div></div></div>
+    <div class="kpi item"><div><div class="num" id="kpi-doctors">620</div><div>Total Doctors</div></div></div>
+    <div class="kpi item"><div><div class="num" id="kpi-plans">5,430</div><div>Active Plans</div></div></div>
+    <div class="kpi item"><div><div class="num" id="kpi-inquiries">12</div><div>New Inquiries</div></div></div>
+  </div>
+
+  <!-- Manage Plans -->
+  <div class="card" style="margin-top:16px">
+    <h3>Manage Plans</h3>
+    <form id="plan-form" class="grid" style="grid-template-columns:1fr 1fr;gap:12px">
+      <div>
+        <label>Plan Name</label>
+        <input id="plan-name" required placeholder="e.g. Monthly">
+      </div>
+      <div>
+        <label>Price (₹)</label>
+        <input id="plan-price" type="number" min="0" step="1" required placeholder="e.g. 299">
+      </div>
+      <div>
+        <label>Duration</label>
+        <select id="plan-duration" required>
+          <option value="monthly">Monthly</option>
+          <option value="quarterly">Quarterly</option>
+          <option value="yearly">Yearly</option>
+        </select>
+      </div>
+      <div>
+        <label>Features (comma separated)</label>
+        <input id="plan-features" placeholder="OPD 30%, 1 Free follow-up, Lab 10%">
+      </div>
+      <div style="grid-column:1/-1">
+        <label>Description</label>
+        <textarea id="plan-desc" rows="3" placeholder="Short description"></textarea>
+      </div>
+      <div class="form-actions" style="grid-column:1/-1">
+        <button class="btn" id="plan-save" type="submit">Save Plan</button>
+        <button class="btn secondary" id="plan-reset" type="button">Reset</button>
+      </div>
+    </form>
+    <div class="form-actions" style="margin-top:8px;gap:8px">
+      <input id="plan-search" placeholder="Search plans..." style="max-width:260px">
+      <select id="plan-filter-duration" style="max-width:220px"><option value="">All Durations</option><option value="monthly">Monthly</option><option value="quarterly">Quarterly</option><option value="yearly">Yearly</option></select>
+    </div>
+    <table class="table" id="plan-table" style="margin-top:12px">
+      <thead>
+        <tr>
+          <th data-sort="name">Name</th>
+          <th>Description</th>
+          <th data-sort="price">Price</th>
+          <th data-sort="duration">Duration</th>
+          <th>Features</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- Users Manage -->
+  <div class="card" style="margin-top:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+      <h3>User Manage</h3>
+      <div class="form-actions" style="gap:8px">
+        <button class="btn secondary" id="user-export-excel" type="button">Export Excel</button>
+        <button class="btn secondary" id="user-export-pdf" type="button">Export PDF</button>
+      </div>
+    </div>
+    <div class="form-actions" style="gap:8px">
+      <input id="user-search" placeholder="Search users (name/email/phone)..." style="max-width:320px">
+      <select id="user-status-filter" style="max-width:220px"><option value="">All Status</option><option value="active">Active</option><option value="suspended">Suspended</option></select>
+    </div>
+    <table class="table" id="user-table" style="margin-top:12px">
+      <thead>
+        <tr>
+          <th>Name</th><th>Email</th><th>Phone</th><th>Plan</th><th>Start</th><th>Expiry</th><th>Status</th><th>Treatments</th><th>Spent (₹)</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- Manage Doctors -->
+  <div class="card" style="margin-top:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+      <h3>Manage Doctors</h3>
+      <div class="form-actions" style="gap:8px">
+        <button class="btn secondary" id="doc-export-excel" type="button">Export Excel</button>
+        <button class="btn secondary" id="doc-export-pdf" type="button">Export PDF</button>
+      </div>
+    </div>
+    <div class="form-actions" style="gap:8px">
+      <input id="doctor-search" placeholder="Search doctors (name/city/spec)..." style="max-width:320px">
+      <select id="doctor-status-filter" style="max-width:220px"><option value="">All Status</option><option value="active">Active</option><option value="inactive">Inactive</option></select>
+    </div>
+    <table class="table" id="doctor-table" style="margin-top:12px">
+      <thead>
+        <tr>
+          <th>Name</th><th>Status</th><th>Daily Patients</th><th>Monthly Patients</th><th>Billing (count)</th><th>Total (₹)</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- Inquiries -->
+  <div class="card" style="margin-top:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+      <h3>Inquiries</h3>
+      <div>
+        <span class="badge" id="inq-badge">New <span id="inq-count">0</span></span>
+      </div>
+    </div>
+    <div class="form-actions" style="gap:8px;margin-top:8px">
+      <button class="btn" id="tab-patient" type="button">Patients</button>
+      <button class="btn secondary" id="tab-doctor" type="button">Doctors</button>
+    </div>
+    <div id="inquiries-patient" style="margin-top:8px">
+      <table class="table"><thead><tr><th>Name</th><th>Email</th><th>Date</th><th>Message</th><th>Status</th><th>Actions</th></tr></thead><tbody id="inq-patient-tbody"></tbody></table>
+    </div>
+    <div id="inquiries-doctor" class="hidden" style="margin-top:8px">
+      <table class="table"><thead><tr><th>Name</th><th>Email</th><th>Date</th><th>Message</th><th>Status</th><th>Actions</th></tr></thead><tbody id="inq-doctor-tbody"></tbody></table>
+    </div>
+  </div>
+
+</div></section>
+
+<footer class="footer"><div class="container">© Health Recharge</div></footer>
+<script src="js/main.js"></script>
+</body></html>

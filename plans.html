@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plans | Health Recharge</title>
+<link rel="stylesheet" href="css/style.css">
+</head><body>
+<header class="header"><div class="container nav">
+  <a class="brand" href="index.html"><img src="assets/images/logo.svg"/> Health Recharge</a>
+  <nav class="nav-links" id="nav-links">
+    <a href="index.html">Home</a>
+    <a href="plans.html" class="badge">Plans</a>
+    <a href="doctors.html">Doctors</a>
+    <a href="login.html">Login</a>
+    <a href="signup.html" class="btn">Sign Up</a>
+  </nav>
+  <button class="hamburger" id="hamburger">☰</button>
+</div></header>
+
+<section class="section"><div class="container">
+  <h1 class="title">Subscription Plans</h1>
+  <p class="lead">Compare and choose. Filters niche diye gaye hain.</p>
+  <div id="plan-filter" class="card">
+    <div class="filter-row">
+      <div>
+        <label>Duration</label>
+        <select id="filter-duration">
+          <option value="">Any</option>
+          <option value="monthly">Monthly</option>
+          <option value="quarterly">Quarterly</option>
+          <option value="yearly">Yearly</option>
+        </select>
+      </div>
+      <div>
+        <label>Max Price (₹)</label>
+        <input id="filter-price" type="number" placeholder="e.g. 1000" />
+      </div>
+    </div>
+  </div>
+
+  <div class="grid plans" style="margin-top:16px">
+    <article class="card plan" data-duration="monthly" data-price="299">
+      <h3>Monthly</h3><div class="price">₹299</div>
+      <ul><li>OPD upto 30%</li><li>1 Free follow-up</li><li>Lab 10% off</li></ul>
+      <a class="btn js-buy-plan" href="payment.html">Recharge Now</a>
+    </article>
+    <article class="card plan" data-duration="quarterly" data-price="799">
+      <h3>Quarterly</h3><div class="price">₹799</div>
+      <ul><li>OPD upto 35%</li><li>2 Free follow-ups</li><li>Priority support</li></ul>
+      <a class="btn js-buy-plan" href="payment.html">Recharge Now</a>
+    </article>
+    <article class="card plan" data-duration="yearly" data-price="2599">
+      <h3>Yearly</h3><div class="price">₹2,599</div>
+      <ul><li>OPD upto 40%</li><li>5 Free follow-ups</li><li>Family coverage</li></ul>
+      <a class="btn js-buy-plan" href="payment.html">Recharge Now</a>
+    </article>
+  </div>
+
+  <div class="card" style="margin-top:24px;overflow:auto">
+    <table class="table">
+      <thead><tr><th>Plan</th><th>Price</th><th>Duration</th><th>Benefits</th></tr></thead>
+      <tbody>
+        <tr><td>Monthly</td><td>₹299</td><td>30 days</td><td>OPD upto 30%, 1 free follow-up</td></tr>
+        <tr><td>Quarterly</td><td>₹799</td><td>90 days</td><td>OPD upto 35%, 2 free follow-ups</td></tr>
+        <tr><td>Yearly</td><td>₹2,599</td><td>365 days</td><td>OPD upto 40%, 5 free follow-ups</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div></section>
+
+  <!-- Auth Modal -->
+  <div class="modal hidden" id="auth-modal" style="position:fixed;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.5)">
+    <div class="card" style="max-width:460px;width:92%">
+      <div id="auth-step-choose">
+        <h3>Continue to buy plan</h3>
+        <p class="lead">Please sign in or create a new account to proceed.</p>
+        <div class="form-actions" style="margin-top:12px">
+          <a class="btn" href="login.html" id="auth-signin">Sign In</a>
+          <button class="btn secondary" id="auth-signup">Sign Up</button>
+          <button class="btn secondary js-close-modal" type="button">Close</button>
+        </div>
+      </div>
+      <div id="auth-step-role" class="hidden">
+        <h3>Select Role</h3>
+        <p class="lead">Are you signing up as a Patient or a Doctor?</p>
+        <div class="form-actions" style="margin-top:12px">
+          <button class="btn" data-role="patient">Patient</button>
+          <button class="btn" data-role="doctor">Doctor</button>
+          <button class="btn secondary js-close-modal" type="button">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<footer class="footer"><div class="container">© Health Recharge</div></footer>
+<script src="js/main.js"></script>
+</body></html>

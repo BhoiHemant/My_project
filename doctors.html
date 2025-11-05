@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Doctors & Clinics | Health Recharge</title>
+<link rel="stylesheet" href="css/style.css">
+</head><body>
+<header class="header"><div class="container nav">
+  <a class="brand" href="index.html"><img src="assets/images/logo.svg"/> Health Recharge</a>
+  <nav class="nav-links" id="nav-links">
+    <a href="index.html">Home</a>
+    <a href="plans.html">Plans</a>
+    <a href="doctors.html" class="badge">Doctors</a>
+    <a href="login.html">Login</a>
+    <a href="signup.html" class="btn">Sign Up</a>
+  </nav>
+  <button class="hamburger" id="hamburger">☰</button>
+</div></header>
+
+<section class="section"><div class="container">
+  <h1 class="title">Doctors & Clinics</h1>
+  <p class="lead">Search by city, specialization, rating. Future: live map & booking.</p>
+
+  <div id="doctor-filters" class="card">
+    <div class="filter-row">
+      <div><label>City</label><input id="f-city" placeholder="e.g. Delhi"></div>
+      <div><label>Specialization</label><input id="f-spec" placeholder="e.g. cardiology"></div>
+      <div style="display:flex;align-items:center;gap:8px"><input id="f-free" type="checkbox"> <label for="f-free">Free Consultation</label></div>
+      <div style="display:flex;align-items:center;gap:8px"><input id="f-disc" type="checkbox"> <label for="f-disc">Discount Available</label></div>
+    </div>
+  </div>
+
+  <div class="grid doctor-grid" style="margin-top:16px">
+    <article class="card doctor-card" data-city="Pune" data-spec="dentist" data-free="1" data-disc="1">
+      <img src="assets/images/logo.svg" alt="Doctor"/>
+      <h3>Dr. Aditi Kulkarni</h3>
+      <div class="doctor-meta"><span>Dentist • 7 yrs</span><span>⭐ 4.6</span></div>
+      <a class="btn" href="doctor-profile.html">View Profile</a>
+    </article>
+    <article class="card doctor-card" data-city="Delhi" data-spec="cardiology" data-free="0" data-disc="1">
+      <img src="assets/images/logo.svg" alt="Doctor"/>
+      <h3>Dr. Raj Sharma</h3>
+      <div class="doctor-meta"><span>Cardiologist • 12 yrs</span><span>⭐ 4.8</span></div>
+      <a class="btn" href="doctor-profile.html">View Profile</a>
+    </article>
+    <article class="card doctor-card" data-city="Mumbai" data-spec="dermatology" data-free="0" data-disc="0">
+      <img src="assets/images/logo.svg" alt="Doctor"/>
+      <h3>Dr. Neha Rao</h3>
+      <div class="doctor-meta"><span>Dermatologist • 9 yrs</span><span>⭐ 4.5</span></div>
+      <a class="btn" href="doctor-profile.html">View Profile</a>
+    </article>
+  </div>
+</div></section>
+
+<footer class="footer"><div class="container">© Health Recharge</div></footer>
+<script src="js/main.js"></script>
+</body></html>

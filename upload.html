@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Upload Prescriptions | Health Recharge</title>
+<link rel="stylesheet" href="css/style.css">
+</head><body>
+<header class="header"><div class="container nav">
+  <a class="brand" href="index.html"><img src="assets/images/logo.svg"/> Health Recharge</a>
+  <nav class="nav-links" id="nav-links">
+    <a href="index.html">Home</a>
+    <a href="user-dashboard.html">Dashboard</a>
+    <a href="upload.html" class="badge">Upload</a>
+    <a href="signup.html" class="btn">Sign Up</a>
+  </nav>
+  <button class="hamburger" id="hamburger">☰</button>
+</div></header>
+
+<section class="section"><div class="container" style="max-width:720px">
+  <h1 class="title">Upload Prescriptions</h1>
+  <p class="lead">Upload PDF/JPG (demo). Future: store with user_id in database + doctor access.</p>
+
+  <div class="card">
+    <label>Select files</label>
+    <input id="file-input" type="file" accept=".pdf,.jpg,.jpeg,.png" multiple>
+  </div>
+  <div id="file-list" class="grid" style="margin-top:16px"></div>
+</div></section>
+
+<footer class="footer"><div class="container">© Health Recharge</div></footer>
+<script src="js/main.js"></script>
+</body></html>

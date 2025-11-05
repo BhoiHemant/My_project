@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign Up | Health Recharge</title>
+<link rel="stylesheet" href="css/style.css">
+</head><body>
+<header class="header"><div class="container nav">
+  <a class="brand" href="index.html"><img src="assets/images/logo.svg"/> Health Recharge</a>
+  <nav class="nav-links" id="nav-links">
+    <a href="index.html">Home</a>
+    <a href="plans.html">Plans</a>
+    <a href="doctors.html">Doctors</a>
+    <a href="signup.html" class="badge">Sign Up</a>
+  </nav>
+  <button class="hamburger" id="hamburger">☰</button>
+</div></header>
+
+<section class="section"><div class="container" style="max-width:560px">
+  <h1 class="title">Create Account</h1>
+  <p class="lead">Sign up with your details to get started. Future: secure backend + social login.</p>
+
+  <form data-validate="simple" class="card">
+    <div class="form-msg alert" style="margin-bottom:12px"></div>
+    <label>Role</label>
+    <div style="display:flex;gap:12px;align-items:center;margin-bottom:8px">
+      <label style="display:flex;gap:6px;align-items:center"><input type="radio" name="role" value="patient" checked> Patient</label>
+      <label style="display:flex;gap:6px;align-items:center"><input type="radio" name="role" value="doctor"> Doctor</label>
+    </div>
+    <label>Full Name</label>
+    <input type="text" name="name" placeholder="Your Name" required>
+    <label>Email</label>
+    <input type="email" name="email" placeholder="you@example.com" required>
+    <label>Password</label>
+    <input type="password" name="password" placeholder="••••••" required>
+    <label>Confirm Password</label>
+    <input type="password" name="confirm_password" placeholder="••••••" required>
+    <div class="form-actions" style="margin-top:12px">
+      <button class="btn" type="submit">Create Account</button>
+      <a class="btn link" href="login.html">Already have an account? Login</a>
+    </div>
+  </form>
+</div></section>
+
+<footer class="footer"><div class="container">© Health Recharge</div></footer>
+<script src="js/main.js"></script>
+</body></html>

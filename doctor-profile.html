@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Doctor Profile | Health Recharge</title>
+<link rel="stylesheet" href="css/style.css">
+</head><body>
+<header class="header"><div class="container nav">
+  <a class="brand" href="index.html"><img src="assets/images/logo.svg"/> Health Recharge</a>
+  <nav class="nav-links" id="nav-links">
+    <a href="index.html">Home</a>
+    <a href="doctors.html">Doctors</a>
+    <a href="login.html">Login</a>
+    <a href="signup.html" class="btn">Sign Up</a>
+  </nav>
+  <button class="hamburger" id="hamburger">☰</button>
+</div></header>
+
+<section class="section"><div class="container">
+  <div class="grid" style="grid-template-columns:1fr 2fr;gap:20px">
+    <div class="card"><img id="dp-photo" src="assets/images/logo.svg" alt="Doctor" style="height:240px;object-fit:contain;background:#0b1220;border-radius:10px"/>
+      <h2>Dr. Raj Sharma</h2>
+      <div class="badge"><span id="dp-spec">Cardiologist</span> • 12 yrs</div>
+      <p class="lead">Clinic: <span id="dp-clinic">HeartCare, Delhi</span></p>
+      <p class="lead">Address: <span id="dp-address">Street, City</span></p>
+      <div class="kpi"><div class="item"><div class="num">4.8</div><div>Rating</div></div><div class="item"><div class="num">120+</div><div>Reviews</div></div></div>
+    </div>
+    <div class="card">
+      <h3>Timings & Availability</h3>
+      <p>Mon–Sat: 10am–2pm, 6pm–9pm</p>
+      <h3>Benefits for your plan</h3>
+      <ul>
+        <li>OPD discount upto 35%</li>
+        <li>Follow-up free within 7 days</li>
+      </ul>
+      <h3>Rate This Doctor</h3>
+      <div class="form-row">
+        <div><label>Rating</label><select><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select></div>
+        <div><label>Comment</label><input placeholder="Share your feedback"></div>
+      </div>
+      <div class="form-actions"><button class="btn" type="button" onclick="alert('Thanks for rating! (demo)')">Submit</button></div>
+    </div>
+  </div>
+</div></section>
+
+<footer class="footer"><div class="container">© Health Recharge</div></footer>
+<script src="js/main.js"></script>
+</body></html>

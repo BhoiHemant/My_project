@@ -4,10 +4,10 @@
   "description": "Express + MySQL backend for existing frontend (auth, doctors, patients, billing)",
   "main": "server.js",
   "type": "module",
-  "scripts": {
-    "dev": "nodemon server.js",
-    "start": "node server.js"
-  },
+ "scripts": {
+  "dev": "nodemon backend/server.js",
+  "start": "node backend/server.js"
+},
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",

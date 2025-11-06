@@ -50,30 +50,32 @@ const PORT = process.env.PORT || 5000;
     console.log(`✅ Server running on port ${PORT}`);
     if (!dbReady) {
       console.warn('[WARN] DB not initialized at startup; API endpoints involving DB may fail until resolved.');
+    } else {
+      console.log('✅ DB connected');
     }
     // Self-test runner
     try{
         if (globalThis.__ran_self_tests__) return; // run once
         globalThis.__ran_self_tests__ = true;
-        if (typeof fetch !== 'function') { console.warn('[SELFTEST] fetch not available in Node runtime'); return; }
-        const base = `http://localhost:${PORT}`;
-        const results = { ok: [], fail: [] };
-        const ok = (m)=>{ console.log(`✅ ${m} passed`); results.ok.push(m); };
-        const fail = (m,e)=>{ console.error(`❌ ${m} failed — ${e?.message||e}`); results.fail.push(`${m}: ${e?.message||e}`); };
+      if (typeof fetch !== 'function') { console.warn('[SELFTEST] fetch not available in Node runtime'); return; }
+      const base = `http://localhost:${PORT}`;
+      const results = { ok: [], fail: [] };
+      const ok = (m)=>{ console.log(`✅ ${m} passed`); results.ok.push(m); };
+      const fail = (m,e)=>{ console.error(`❌ ${m} failed — ${e?.message||e}`); results.fail.push(`${m}: ${e?.message||e}`); };
 
-        const post = async (url, body, token)=>{
-          const res = await fetch(base+url, { method:'POST', headers: { 'Content-Type':'application/json', ...(token?{Authorization:`Bearer ${token}`}:{}) }, body: JSON.stringify(body||{}) });
-          const text = await res.text();
-          let data; try{ data = JSON.parse(text); }catch{ data = text; }
-          if(!res.ok){ const err = new Error((data&&data.message)||`HTTP ${res.status}`); err.status=res.status; err.data=data; throw err; }
-          return data;
-        };
-        const get = async (url, token)=>{
-          const res = await fetch(base+url, { headers: { ...(token?{Authorization:`Bearer ${token}`}:{}) } });
-          const text = await res.text(); let data; try{ data=JSON.parse(text);}catch{ data=text; }
-          if(!res.ok){ const err = new Error((data&&data.message)||`HTTP ${res.status}`); err.status=res.status; err.data=data; throw err; }
-          return { res, data };
-        };
+      const post = async (url, body, token)=>{
+        const res = await fetch(base+url, { method:'POST', headers: { 'Content-Type':'application/json', ...(token?{Authorization:`Bearer ${token}`}:{}) }, body: JSON.stringify(body||{}) });
+        const text = await res.text();
+        let data; try{ data = JSON.parse(text); }catch{ data = text; }
+        if(!res.ok){ const err = new Error((data&&data.message)||`HTTP ${res.status}`); err.status=res.status; err.data=data; throw err; }
+        return data;
+      };
+      const get = async (url, token)=>{
+        const res = await fetch(base+url, { headers: { ...(token?{Authorization:`Bearer ${token}`}:{}) } });
+        const text = await res.text(); let data; try{ data=JSON.parse(text);}catch{ data=text; }
+        if(!res.ok){ const err = new Error((data&&data.message)||`HTTP ${res.status}`); err.status=res.status; err.data=data; throw err; }
+        return { res, data };
+      };
 
         // Signup patient
         const stamp = Date.now();

@@ -16,7 +16,10 @@ export const initDB = async () => {
     const admin = await mysql.createConnection({
       host: process.env.DB_HOST,
       user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD
+      password: process.env.DB_PASSWORD,
+      port: Number(process.env.DB_PORT || 3306),
+      connectTimeout: 20000,
+      ...(process.env.NODE_ENV === 'production' ? { ssl: { rejectUnauthorized: false } } : {})
     });
     await admin.query(`CREATE DATABASE IF NOT EXISTS \`${process.env.DB_NAME}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`);
     await admin.end();

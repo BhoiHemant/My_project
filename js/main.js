@@ -3,7 +3,14 @@
   const $ = (sel,scope=document)=>scope.querySelector(sel);
   const $$ = (sel,scope=document)=>Array.from(scope.querySelectorAll(sel));
   // Backend API base URL (production)
-  const API_BASE = "https://vaidya-ihc9.onrender.com";
+  const API_BASE = (function(){
+    const meta = document.querySelector('meta[name="api-base"]');
+    const fromMeta = meta && meta.getAttribute('content');
+    const fromGlobal = (typeof window!=="undefined" && window.API_BASE) ? String(window.API_BASE) : '';
+    const fallback = `${window.location.origin}`;
+    const local = 'http://localhost:5000';
+    return fromMeta || fromGlobal || (fallback && fallback!=='null' ? fallback : '') || local;
+  })();
 
   // Session is managed by httpOnly cookie on the server (no localStorage)
   function clearAuth(){ /* cookie-cleared server-side */ }

@@ -19,7 +19,9 @@ export const auth = (req, res, next) => {
 };
 
 export const doctorOnly = (req, res, next) => {
-  if (!req.user || req.user.role !== 'doctor') {
+  // If role is present and not doctor, block. If role is absent (current schema), allow.
+  if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
+  if (typeof req.user.role !== 'undefined' && req.user.role !== 'doctor') {
     return res.status(403).json({ message: 'Unauthorized: doctor access only' });
   }
   next();

@@ -38,7 +38,17 @@ app.get('/health', async (req, res) => {
 
 // Middleware
 app.use(helmet());
-app.use(cors({ origin: "https://vedamed.netlify.app", credentials: true }));
+// Allow multiple origins (comma-separated) via env; default to common local hosts and Netlify
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:5173,http://localhost:3000,http://127.0.0.1:3000,https://vedamed.netlify.app')
+  .split(',')
+  .map(s=>s.trim());
+app.use(cors({
+  origin: function(origin, callback){
+    if(!origin) return callback(null, true); // allow non-browser or same-origin
+    return callback(null, allowedOrigins.includes(origin));
+  },
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());

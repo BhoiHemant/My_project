@@ -88,7 +88,7 @@ export const me = async (req, res) => {
 
 export const logout = async (req, res) => {
   try {
-    res.clearCookie('token', { path: '/', sameSite: 'None', secure: true });
+    res.clearCookie('token', cookieOptions());
     return res.status(200).json({ message: 'Logged out' });
   } catch (e) {
     return res.status(500).json({ message: 'Server error' });
@@ -145,8 +145,7 @@ export const login = async (req, res) => {
     const token = jwt.sign({ sub: user.id, email: user.email }, process.env.JWT_SECRET, {
       expiresIn: process.env.JWT_EXPIRES_IN || '15m'
     });
-    // Cross-site frontends (Netlify) require SameSite=None + Secure for cookies to be sent
-    res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'None', path: '/', maxAge: parseExpiryToMs(process.env.JWT_EXPIRES_IN || '15m') });
+    res.cookie('token', token, cookieOptions());
     return res.status(200).json({ success: true });
   } catch (err) {
     console.error('Login error:', err);

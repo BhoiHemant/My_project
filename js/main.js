@@ -35,12 +35,18 @@
   protectPageWithServer();
 
   function initAuthUI(){
-    // Inject Logout button if logged in
+    // Inject Logout button only if authenticated
     const nav = $('#nav-links');
-    if(nav){
-      const existing = nav.querySelector('#nav-logout');
-      if(!existing){ const a=document.createElement('a'); a.href='#'; a.id='nav-logout'; a.className='btn secondary'; a.textContent='Logout'; nav.appendChild(a); }
+    async function ensureLogout(){
+      try{
+        const me = await apiFetch('/api/auth/me', { method:'GET' });
+        if(me && me.email && nav){
+          const existing = nav.querySelector('#nav-logout');
+          if(!existing){ const a=document.createElement('a'); a.href='#'; a.id='nav-logout'; a.className='btn secondary'; a.textContent='Logout'; nav.appendChild(a); }
+        }
+      }catch(_){ /* not logged in: no logout shown */ }
     }
+    ensureLogout();
     document.addEventListener('click',(e)=>{
       const a = e.target.closest('#nav-logout');
       if(a){ e.preventDefault(); logout(); }
@@ -343,15 +349,7 @@
     return (window.location.href='user-dashboard.html');
   }
 
-  // If authenticated (cookie), avoid showing login/signup by checking /me
-  (function(){
-    const path = window.location.pathname;
-    if(/login\.html$/.test(path) || /signup\.html$/.test(path)){
-      apiFetch('/api/auth/me', { method:'GET' })
-        .then(user=>{ if(user && user.email){ window.location.href='user-dashboard.html'; } })
-        .catch(()=>{/* not logged in */});
-    }
-  })();
+  // Do not auto-redirect away from login/signup; only protect dashboards via protectPageWithServer()
 
   // Role-based page guards
   (function(){

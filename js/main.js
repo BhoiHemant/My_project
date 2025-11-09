@@ -3,23 +3,25 @@
   const $ = (sel,scope=document)=>scope.querySelector(sel);
   const $$ = (sel,scope=document)=>Array.from(scope.querySelectorAll(sel));
   // Live backend API base URL
-  const API_BASE = (window.API_BASE && String(window.API_BASE)) || 'https://vaidya-ihc9.onrender.com';
+  const API_BASE = "https://vaidya-ihc9.onrender.com";
   const TOKEN_KEY = 'auth_token';
   const USER_KEY = 'auth_user';
 
   function getToken(){ try{return localStorage.getItem(TOKEN_KEY)||'';}catch(_){return '';} }
-  function setToken(tok){ try{ if(tok){ localStorage.setItem(TOKEN_KEY, tok);} }catch(_){/* ignore */} }
+  function setToken(tok){ try{ if(tok){ localStorage.setItem(TOKEN_KEY, tok); console.log('[AUTH] token stored'); } }catch(_){/* ignore */} }
   function clearAuth(){ try{ localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(USER_KEY);}catch(_){/* ignore */} }
   function getUser(){ try{ return JSON.parse(localStorage.getItem(USER_KEY)||'null'); }catch(_){ return null; } }
-  function setUser(u){ try{ if(u) localStorage.setItem(USER_KEY, JSON.stringify(u)); }catch(_){/* ignore */} }
+  function setUser(u){ try{ if(u){ localStorage.setItem(USER_KEY, JSON.stringify(u)); console.log('[AUTH] user stored', u); } }catch(_){/* ignore */} }
 
   async function apiFetch(path, options={}){
     const token = getToken();
     const headers = Object.assign({ 'Content-Type': 'application/json' }, options.headers||{});
     if(token){ headers['Authorization'] = `Bearer ${token}`; }
     const res = await fetch(`${API_BASE}${path}`, Object.assign({}, options, { headers }));
+    console.log(`[API] ${options.method||'GET'} ${path} -> ${res.status}`);
     if(res.status === 401){ clearAuth(); if(!window.location.pathname.endsWith('login.html')) window.location.href = 'login.html'; throw new Error('Unauthorized'); }
     let data = null; try{ data = await res.json(); }catch(_){/* no json */}
+    console.log('[API] JSON:', data);
     if(!res.ok){ const msg = (data && (data.message||data.error)) || `Request failed (${res.status})`; const err = new Error(msg); err.status=res.status; err.data=data; throw err; }
     return data;
   }
@@ -332,6 +334,17 @@
     if(role==='admin') return (window.location.href='admin-dashboard.html');
     return (window.location.href='user-dashboard.html');
   }
+
+  // If already authenticated, redirect away from auth pages
+  (function(){
+    const path = window.location.pathname;
+    const hasToken = !!getToken();
+    if(hasToken && (/login\.html$/.test(path) || /signup\.html$/.test(path))){
+      const user = getUser();
+      console.log('[AUTH] Authenticated user detected on auth page, redirecting...');
+      redirectByRole(user);
+    }
+  })();
 
   // Role-based page guards
   (function(){

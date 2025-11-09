@@ -14,7 +14,13 @@
     const headers = Object.assign({ 'Content-Type': 'application/json' }, options.headers||{});
     const res = await fetch(`${API_BASE}${path}`, Object.assign({}, options, { headers, credentials: 'include' }));
     console.log(`[API] ${options.method||'GET'} ${path} -> ${res.status}`);
-    if(res.status === 401){ clearAuth(); if(!window.location.pathname.endsWith('login.html')) window.location.href = 'login.html'; throw new Error('Unauthorized'); }
+    if(res.status === 401){
+      clearAuth();
+      const protectedPaths = [/doctor-dashboard\.html$/, /user-dashboard\.html$/, /admin-dashboard\.html$/];
+      const onProtected = protectedPaths.some(r=>r.test(window.location.pathname));
+      if(onProtected){ window.location.href = 'login.html'; }
+      throw new Error('Unauthorized');
+    }
     let data = null; try{ data = await res.json(); }catch(_){/* no json */}
     console.log('[API] JSON:', data);
     if(!res.ok){ const msg = (data && (data.message||data.error)) || `Request failed (${res.status})`; const err = new Error(msg); err.status=res.status; err.data=data; throw err; }

@@ -1,23 +1,10 @@
 // db/connection.js - MySQL connection pool and auto table creation
 import mysql from 'mysql2/promise';
 import dotenv from 'dotenv';
+import pool from '../config/db.js';
 dotenv.config();
 
-let pool;
-
 export const getPool = () => {
-  if (!pool) {
-    pool = mysql.createPool({
-      host: process.env.DB_HOST,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-      waitForConnections: true,
-      connectionLimit: 10,
-      queueLimit: 0,
-      multipleStatements: true
-    });
-  }
   return pool;
 };
 
@@ -81,7 +68,13 @@ export const initDB = async () => {
 
   const conn = await pool.getConnection();
   try {
-    await conn.query(createTablesSQL);
+    const statements = createTablesSQL
+      .split(/;\s*\n/)
+      .map(s => s.trim())
+      .filter(s => s.length > 0);
+    for (const stmt of statements) {
+      await conn.query(stmt);
+    }
     // Ensure users.role exists even on older installations
     try {
       await conn.query("ALTER TABLE users ADD COLUMN IF NOT EXISTS role VARCHAR(20) NOT NULL DEFAULT 'patient'");

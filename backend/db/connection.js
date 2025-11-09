@@ -30,11 +30,11 @@ export const initDB = async () => {
 
     CREATE TABLE IF NOT EXISTS users (
       id INT AUTO_INCREMENT PRIMARY KEY,
-      name VARCHAR(100) NOT NULL,
-      email VARCHAR(150) NOT NULL UNIQUE,
-      password VARCHAR(255) NOT NULL,
-      role VARCHAR(20) NOT NULL DEFAULT 'patient',
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      email VARCHAR(255) NOT NULL UNIQUE,
+      password_hash VARCHAR(255) NOT NULL,
+      is_verified TINYINT(1) DEFAULT 0,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) ENGINE=InnoDB;
 
     CREATE TABLE IF NOT EXISTS doctors (
@@ -75,18 +75,31 @@ export const initDB = async () => {
     for (const stmt of statements) {
       await conn.query(stmt);
     }
-    // Ensure users.role exists even on older installations
-    try {
-      await conn.query("ALTER TABLE users ADD COLUMN IF NOT EXISTS role VARCHAR(20) NOT NULL DEFAULT 'patient'");
-    } catch (e) {
-      // Fallback for MySQL versions without IF NOT EXISTS
-      try {
-        const [cols] = await conn.query("SHOW COLUMNS FROM users LIKE 'role'");
-        if (!cols || cols.length === 0) {
-          await conn.query("ALTER TABLE users ADD COLUMN role VARCHAR(20) NOT NULL DEFAULT 'patient'");
-        }
-      } catch(_) { /* ignore */ }
+    // Ensure legacy installs have necessary columns
+    const ensureCol = async (name, def) => {
+      const [cols] = await conn.query('SHOW COLUMNS FROM users LIKE ?', [name]);
+      if (!cols || cols.length === 0) {
+        await conn.query(`ALTER TABLE users ADD COLUMN ${def}`);
+      }
+    };
+    await ensureCol('password_hash', 'password_hash VARCHAR(255) NOT NULL');
+    await ensureCol('is_verified', 'is_verified TINYINT(1) DEFAULT 0');
+    const [hasUpd] = await conn.query("SHOW COLUMNS FROM users LIKE 'updated_at'");
+    if (!hasUpd || hasUpd.length === 0) {
+      await conn.query('ALTER TABLE users ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP');
     }
+
+    // Optional: keep role/name if present in legacy schema
+    // Ensure OTP table
+    await conn.query(`CREATE TABLE IF NOT EXISTS email_otps (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      user_id INT NOT NULL,
+      otp VARCHAR(10) NOT NULL,
+      expires_at DATETIME NOT NULL,
+      attempts INT DEFAULT 0,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB`);
     console.log('Database tables are ensured.');
   } finally {
     conn.release();

@@ -3,6 +3,8 @@ import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
+import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
 import { initDB } from './db/connection.js';
 
 // Routes
@@ -25,9 +27,13 @@ app.get('/health', (req, res) => {
 });
 
 // Middleware
-app.use(cors()); // Enable CORS for all origins; adjust as needed
-app.use(express.json()); // Parse JSON bodies
-app.use(morgan('dev')); // HTTP request logging
+const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || '*';
+app.use(helmet());
+app.use(cors({ origin: FRONTEND_ORIGIN === '*' ? true : FRONTEND_ORIGIN, credentials: true }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+app.use(morgan('dev'));
 
 // Mount routes (no prefix to match requested endpoints)
 app.use('/', authRoutes);

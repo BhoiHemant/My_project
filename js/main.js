@@ -2,22 +2,17 @@
 (function(){
   const $ = (sel,scope=document)=>scope.querySelector(sel);
   const $$ = (sel,scope=document)=>Array.from(scope.querySelectorAll(sel));
-  // Live backend API base URL
-  const API_BASE = "https://vaidya-ihc9.onrender.com";
-  const TOKEN_KEY = 'auth_token';
+  // Backend API base URL (can be replaced by Netlify env at build: %%BACKEND_URL%%)
+  const API_BASE = (document.querySelector('meta[name="api-base"]')?.getAttribute('content')) || '%%BACKEND_URL%%' || '';
   const USER_KEY = 'auth_user';
 
-  function getToken(){ try{return localStorage.getItem(TOKEN_KEY)||'';}catch(_){return '';} }
-  function setToken(tok){ try{ if(tok){ localStorage.setItem(TOKEN_KEY, tok); console.log('[AUTH] token stored'); } }catch(_){/* ignore */} }
-  function clearAuth(){ try{ localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(USER_KEY);}catch(_){/* ignore */} }
+  function clearAuth(){ try{ localStorage.removeItem(USER_KEY);}catch(_){/* ignore */} }
   function getUser(){ try{ return JSON.parse(localStorage.getItem(USER_KEY)||'null'); }catch(_){ return null; } }
   function setUser(u){ try{ if(u){ localStorage.setItem(USER_KEY, JSON.stringify(u)); console.log('[AUTH] user stored', u); } }catch(_){/* ignore */} }
 
   async function apiFetch(path, options={}){
-    const token = getToken();
     const headers = Object.assign({ 'Content-Type': 'application/json' }, options.headers||{});
-    if(token){ headers['Authorization'] = `Bearer ${token}`; }
-    const res = await fetch(`${API_BASE}${path}`, Object.assign({}, options, { headers }));
+    const res = await fetch(`${API_BASE}${path}`, Object.assign({}, options, { headers, credentials: 'include' }));
     console.log(`[API] ${options.method||'GET'} ${path} -> ${res.status}`);
     if(res.status === 401){ clearAuth(); if(!window.location.pathname.endsWith('login.html')) window.location.href = 'login.html'; throw new Error('Unauthorized'); }
     let data = null; try{ data = await res.json(); }catch(_){/* no json */}
@@ -28,7 +23,7 @@
 
   function protectPage(){
     const isProtected = [/doctor-dashboard\.html$/, /user-dashboard\.html$/, /admin-dashboard\.html$/].some(r=>r.test(window.location.pathname));
-    if(isProtected && !getToken()){ window.location.href = 'login.html'; }
+    if(isProtected && !getUser()){ window.location.href = 'login.html'; }
   }
   protectPage();
 
@@ -37,7 +32,7 @@
     const nav = $('#nav-links');
     if(nav){
       const existing = nav.querySelector('#nav-logout');
-      if(getToken() && !existing){ const a=document.createElement('a'); a.href='#'; a.id='nav-logout'; a.className='btn secondary'; a.textContent='Logout'; nav.appendChild(a); }
+      if(getUser() && !existing){ const a=document.createElement('a'); a.href='#'; a.id='nav-logout'; a.className='btn secondary'; a.textContent='Logout'; nav.appendChild(a); }
     }
     document.addEventListener('click',(e)=>{
       const a = e.target.closest('#nav-logout');
@@ -329,18 +324,15 @@
   }
 
   function redirectByRole(user){
-    const role = (user?.role||'').toLowerCase();
-    if(role==='doctor') return (window.location.href='doctor-dashboard.html');
-    if(role==='admin') return (window.location.href='admin-dashboard.html');
+    // Minimal redirect without relying on JWT in client
     return (window.location.href='user-dashboard.html');
   }
 
   // If already authenticated, redirect away from auth pages
   (function(){
     const path = window.location.pathname;
-    const hasToken = !!getToken();
-    if(hasToken && (/login\.html$/.test(path) || /signup\.html$/.test(path))){
-      const user = getUser();
+    const user = getUser();
+    if(user && (/login\.html$/.test(path) || /signup\.html$/.test(path))){
       console.log('[AUTH] Authenticated user detected on auth page, redirecting...');
       redirectByRole(user);
     }
@@ -369,17 +361,16 @@
       const fd = new FormData(form);
       const email = (fd.get('email')||'').toString().trim();
       const pass = (fd.get('password')||'').toString();
-      if(!emailRegex.test(email)) return setError(form,'Invalid email. Sahi email daaliye.');
-      if((pass||'').length<6) return setError(form,'Password min 6 chars honi chahiye.');
+      const pwStrong = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+      if(!emailRegex.test(email)) return setError(form,'Invalid email');
+      if(!pwStrong.test(pass)) return setError(form,'Password must be 8+ chars with letter, number, symbol');
       const btn = form.querySelector('button[type="submit"]'); const prev = btn?.textContent; if(btn){ btn.disabled=true; btn.textContent='Logging in...'; }
       (async()=>{
-        console.log('[AUTH] POST /api/login start');
+        console.log('[AUTH] POST /api/auth/login start');
         try{
-          let data;
-          try{ data = await apiFetch('/api/login', { method:'POST', body: JSON.stringify({ email, password: pass }) }); }
-          catch(err){ if(err?.status===404){ console.warn('[AUTH] /api/login 404, retrying /login'); data = await apiFetch('/login', { method:'POST', body: JSON.stringify({ email, password: pass }) }); } else { throw err; } }
+          const data = await apiFetch('/api/auth/login', { method:'POST', body: JSON.stringify({ email, password: pass }) });
           console.log('[AUTH] login success');
-          setToken(data.token); setUser(data.user);
+          setUser({ id: data?.user?.id, email: data?.user?.email });
           setSuccess(form,'Login successful. Redirecting...');
           setTimeout(()=>{ redirectByRole(data.user); },700);
         }catch(err){
@@ -398,30 +389,42 @@
     form?.addEventListener('submit', (e)=>{
       e.preventDefault();
       const fd = new FormData(form);
-      const name = (fd.get('name')||'').toString().trim();
       const email = (fd.get('email')||'').toString().trim();
       const pass = (fd.get('password')||'').toString();
       const confirm = (fd.get('confirm_password')||'').toString();
-      if(!name) return setError(form,'Name required');
-      if(!emailRegex.test(email)) return setError(form,'Invalid email. Sahi email daaliye.');
-      if((pass||'').length<6) return setError(form,'Password min 6 chars honi chahiye.');
+      const pwStrong = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+      if(!emailRegex.test(email)) return setError(form,'Invalid email');
+      if(!pwStrong.test(pass)) return setError(form,'Password must be 8+ chars with letter, number, symbol');
       if(pass!==confirm) return setError(form,'Passwords do not match');
       const btn = form.querySelector('button[type="submit"]'); const prev = btn?.textContent; if(btn){ btn.disabled=true; btn.textContent='Creating...'; }
-      const role = (form.querySelector('input[name="role"]:checked')?.value||'patient').toLowerCase();
       (async()=>{
-        console.log('[AUTH] POST /api/signup start');
+        console.log('[AUTH] POST /api/auth/signup start');
         try{
-          let data;
-          try{ data = await apiFetch('/api/signup', { method:'POST', body: JSON.stringify({ name, email, password: pass, role }) }); }
-          catch(err){ if(err?.status===404){ console.warn('[AUTH] /api/signup 404, retrying /signup'); data = await apiFetch('/signup', { method:'POST', body: JSON.stringify({ name, email, password: pass, role }) }); } else { throw err; } }
-          console.log('[AUTH] signup success');
-          if(data?.token && data?.user){
-            setToken(data.token); setUser(data.user);
-            setSuccess(form,'Signup successful. Redirecting...');
-            setTimeout(()=>{ redirectByRole(data.user); },900);
-          } else {
-            setSuccess(form,'Signup successful. Redirecting to login...');
-            setTimeout(()=>{ window.location.href='login.html'; },900);
+          await apiFetch('/api/auth/signup', { method:'POST', body: JSON.stringify({ email, password: pass }) });
+          console.log('[AUTH] signup success - OTP sent');
+          setSuccess(form,'OTP sent to your email. Please verify to continue.');
+          // Render OTP UI
+          let otpBox = form.querySelector('#otp-box');
+          if(!otpBox){
+            otpBox = document.createElement('div');
+            otpBox.id = 'otp-box';
+            otpBox.className = 'card';
+            otpBox.style.marginTop = '12px';
+            otpBox.innerHTML = `<label>Enter OTP</label><input id="otp-input" placeholder="6-digit OTP"/> <div class="form-actions" style="margin-top:8px"><button class="btn" id="otp-submit" type="button">Verify</button> <button class="btn secondary" id="otp-resend" type="button">Resend OTP</button></div><div id="otp-msg" class="form-msg" style="margin-top:8px"></div>`;
+            form.appendChild(otpBox);
+            otpBox.querySelector('#otp-submit').addEventListener('click', async ()=>{
+              const code = (otpBox.querySelector('#otp-input')?.value||'').trim();
+              if(!code) { setError(otpBox, 'Enter OTP'); return; }
+              try{
+                await apiFetch('/api/auth/verify', { method:'POST', body: JSON.stringify({ email, otp: code }) });
+                setSuccess(otpBox, 'Email verified. You can now login.');
+                setTimeout(()=>{ window.location.href='login.html'; }, 700);
+              }catch(err){ setError(otpBox, err?.message||'Verification failed'); }
+            });
+            otpBox.querySelector('#otp-resend').addEventListener('click', async ()=>{
+              try{ await apiFetch('/api/auth/resend-otp', { method:'POST', body: JSON.stringify({ email }) }); setSuccess(otpBox,'OTP resent'); }
+              catch(err){ setError(otpBox, err?.message||'Failed to resend OTP'); }
+            });
           }
         }catch(err){
           console.error('[AUTH] signup failed:', err);

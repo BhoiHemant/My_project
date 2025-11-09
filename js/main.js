@@ -2,13 +2,13 @@
 (function(){
   const $ = (sel,scope=document)=>scope.querySelector(sel);
   const $$ = (sel,scope=document)=>Array.from(scope.querySelectorAll(sel));
-  // Backend API base URL (can be replaced by Netlify env at build: %%BACKEND_URL%%)
-  const API_BASE = (document.querySelector('meta[name="api-base"]')?.getAttribute('content')) || '%%BACKEND_URL%%' || '';
-  const USER_KEY = 'auth_user';
+  // Backend API base URL (production)
+  const API_BASE = "https://vaidya-ihc9.onrender.com";
 
-  function clearAuth(){ try{ localStorage.removeItem(USER_KEY);}catch(_){/* ignore */} }
-  function getUser(){ try{ return JSON.parse(localStorage.getItem(USER_KEY)||'null'); }catch(_){ return null; } }
-  function setUser(u){ try{ if(u){ localStorage.setItem(USER_KEY, JSON.stringify(u)); console.log('[AUTH] user stored', u); } }catch(_){/* ignore */} }
+  // Session is managed by httpOnly cookie on the server (no localStorage)
+  function clearAuth(){ /* cookie-cleared server-side */ }
+  function getUser(){ return null; }
+  function setUser(u){ /* no-op: session via cookie */ }
 
   async function apiFetch(path, options={}){
     const headers = Object.assign({ 'Content-Type': 'application/json' }, options.headers||{});
@@ -21,25 +21,40 @@
     return data;
   }
 
-  function protectPage(){
+  async function protectPageWithServer(){
     const isProtected = [/doctor-dashboard\.html$/, /user-dashboard\.html$/, /admin-dashboard\.html$/].some(r=>r.test(window.location.pathname));
-    if(isProtected && !getUser()){ window.location.href = 'login.html'; }
+    if(!isProtected) return;
+    try{
+      const me = await apiFetch('/api/auth/me', { method:'GET' });
+      const nameEl = document.getElementById('username');
+      if(nameEl && me && me.email){ nameEl.innerText = me.email; }
+    }catch(err){
+      window.location.href = 'login.html';
+    }
   }
-  protectPage();
+  protectPageWithServer();
 
   function initAuthUI(){
     // Inject Logout button if logged in
     const nav = $('#nav-links');
     if(nav){
       const existing = nav.querySelector('#nav-logout');
-      if(getUser() && !existing){ const a=document.createElement('a'); a.href='#'; a.id='nav-logout'; a.className='btn secondary'; a.textContent='Logout'; nav.appendChild(a); }
+      if(!existing){ const a=document.createElement('a'); a.href='#'; a.id='nav-logout'; a.className='btn secondary'; a.textContent='Logout'; nav.appendChild(a); }
     }
     document.addEventListener('click',(e)=>{
       const a = e.target.closest('#nav-logout');
-      if(a){ e.preventDefault(); clearAuth(); window.location.href='login.html'; }
+      if(a){ e.preventDefault(); logout(); }
     });
   }
   initAuthUI();
+
+  // Global logout function
+  async function logout(){
+    try{ await fetch(`${API_BASE}/api/auth/logout`, { method:'POST', credentials:'include' }); }
+    catch(_){/* ignore */}
+    window.location.href='login.html';
+  }
+  window.logout = logout;
 
   // Mobile nav toggle - hamburger
   document.addEventListener('click', (e)=>{
@@ -328,13 +343,13 @@
     return (window.location.href='user-dashboard.html');
   }
 
-  // If already authenticated, redirect away from auth pages
+  // If authenticated (cookie), avoid showing login/signup by checking /me
   (function(){
     const path = window.location.pathname;
-    const user = getUser();
-    if(user && (/login\.html$/.test(path) || /signup\.html$/.test(path))){
-      console.log('[AUTH] Authenticated user detected on auth page, redirecting...');
-      redirectByRole(user);
+    if(/login\.html$/.test(path) || /signup\.html$/.test(path)){
+      apiFetch('/api/auth/me', { method:'GET' })
+        .then(user=>{ if(user && user.email){ window.location.href='user-dashboard.html'; } })
+        .catch(()=>{/* not logged in */});
     }
   })();
 
@@ -353,7 +368,7 @@
     }
   })();
 
-  // Login page: integrate with backend
+  // Login page: integrate with backend (prevent refresh, cookie-based session)
   if(window.location.pathname.endsWith('/login.html') || window.location.pathname.endsWith('login.html')){
     const form = $('form[data-validate="simple"]');
     form?.addEventListener('submit', (e)=>{
@@ -368,67 +383,13 @@
       (async()=>{
         console.log('[AUTH] POST /api/auth/login start');
         try{
-          const data = await apiFetch('/api/auth/login', { method:'POST', body: JSON.stringify({ email, password: pass }) });
+          await apiFetch('/api/auth/login', { method:'POST', body: JSON.stringify({ email, password: pass }) });
           console.log('[AUTH] login success');
-          setUser({ id: data?.user?.id, email: data?.user?.email });
           setSuccess(form,'Login successful. Redirecting...');
-          setTimeout(()=>{ redirectByRole(data.user); },700);
+          setTimeout(()=>{ window.location.href = 'user-dashboard.html'; },700);
         }catch(err){
           console.error('[AUTH] login failed:', err);
           setError(form, err?.message||'Login failed');
-        }finally{
-          if(btn){ btn.disabled=false; btn.textContent=prev; }
-        }
-      })();
-    });
-  }
-
-  // Signup page: integrate with backend
-  if(window.location.pathname.endsWith('/signup.html') || window.location.pathname.endsWith('signup.html')){
-    const form = $('form[data-validate="simple"]');
-    form?.addEventListener('submit', (e)=>{
-      e.preventDefault();
-      const fd = new FormData(form);
-      const email = (fd.get('email')||'').toString().trim();
-      const pass = (fd.get('password')||'').toString();
-      const confirm = (fd.get('confirm_password')||'').toString();
-      const pwStrong = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
-      if(!emailRegex.test(email)) return setError(form,'Invalid email');
-      if(!pwStrong.test(pass)) return setError(form,'Password must be 8+ chars with letter, number, symbol');
-      if(pass!==confirm) return setError(form,'Passwords do not match');
-      const btn = form.querySelector('button[type="submit"]'); const prev = btn?.textContent; if(btn){ btn.disabled=true; btn.textContent='Creating...'; }
-      (async()=>{
-        console.log('[AUTH] POST /api/auth/signup start');
-        try{
-          await apiFetch('/api/auth/signup', { method:'POST', body: JSON.stringify({ email, password: pass }) });
-          console.log('[AUTH] signup success - OTP sent');
-          setSuccess(form,'OTP sent to your email. Please verify to continue.');
-          // Render OTP UI
-          let otpBox = form.querySelector('#otp-box');
-          if(!otpBox){
-            otpBox = document.createElement('div');
-            otpBox.id = 'otp-box';
-            otpBox.className = 'card';
-            otpBox.style.marginTop = '12px';
-            otpBox.innerHTML = `<label>Enter OTP</label><input id="otp-input" placeholder="6-digit OTP"/> <div class="form-actions" style="margin-top:8px"><button class="btn" id="otp-submit" type="button">Verify</button> <button class="btn secondary" id="otp-resend" type="button">Resend OTP</button></div><div id="otp-msg" class="form-msg" style="margin-top:8px"></div>`;
-            form.appendChild(otpBox);
-            otpBox.querySelector('#otp-submit').addEventListener('click', async ()=>{
-              const code = (otpBox.querySelector('#otp-input')?.value||'').trim();
-              if(!code) { setError(otpBox, 'Enter OTP'); return; }
-              try{
-                await apiFetch('/api/auth/verify', { method:'POST', body: JSON.stringify({ email, otp: code }) });
-                setSuccess(otpBox, 'Email verified. You can now login.');
-                setTimeout(()=>{ window.location.href='login.html'; }, 700);
-              }catch(err){ setError(otpBox, err?.message||'Verification failed'); }
-            });
-            otpBox.querySelector('#otp-resend').addEventListener('click', async ()=>{
-              try{ await apiFetch('/api/auth/resend-otp', { method:'POST', body: JSON.stringify({ email }) }); setSuccess(otpBox,'OTP resent'); }
-              catch(err){ setError(otpBox, err?.message||'Failed to resend OTP'); }
-            });
-          }
-        }catch(err){
-          console.error('[AUTH] signup failed:', err);
-          setError(form, err?.message||'Signup failed');
         }finally{
           if(btn){ btn.disabled=false; btn.textContent=prev; }
         }

@@ -19,7 +19,9 @@ function cookieOptions() {
   const maxAgeMs = parseExpiryToMs(process.env.JWT_EXPIRES_IN || '15m');
   return {
     httpOnly: true,
-    sameSite: 'Strict',
+    // For cross-site frontend (e.g., Netlify) to receive cookies from Render backend,
+    // we must use SameSite=None and Secure in production. Keep Lax locally.
+    sameSite: isProd ? 'None' : 'Lax',
     secure: isProd,
     path: '/',
     maxAge: maxAgeMs
@@ -74,6 +76,24 @@ export const signup = async (req, res) => {
   }
 };
 
+export const me = async (req, res) => {
+  try {
+    // Requires auth middleware upstream to populate req.user
+    if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
+    return res.status(200).json({ id: req.user.id, email: req.user.email });
+  } catch (e) {
+    return res.status(500).json({ message: 'Server error' });
+  }
+};
+
+export const logout = async (req, res) => {
+  try {
+    res.clearCookie('token', { path: '/' });
+    return res.status(200).json({ message: 'Logged out' });
+  } catch (e) {
+    return res.status(500).json({ message: 'Server error' });
+  }
+};
 export const verify = async (req, res) => {
   const { email, otp } = req.body || {};
   const normEmail = normalizeEmail(email);
@@ -125,8 +145,9 @@ export const login = async (req, res) => {
     const token = jwt.sign({ sub: user.id, email: user.email }, process.env.JWT_SECRET, {
       expiresIn: process.env.JWT_EXPIRES_IN || '15m'
     });
-    res.cookie('access_token', token, cookieOptions());
-    return res.status(200).json({ success: true, user: { id: user.id, email: user.email } });
+    // Set required cookie options for production as per spec
+    res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'Strict', path: '/', maxAge: parseExpiryToMs(process.env.JWT_EXPIRES_IN || '15m') });
+    return res.status(200).json({ success: true });
   } catch (err) {
     console.error('Login error:', err);
     return res.status(500).json({ message: 'Server error' });

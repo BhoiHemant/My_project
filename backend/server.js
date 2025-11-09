@@ -5,7 +5,7 @@ import morgan from 'morgan';
 import dotenv from 'dotenv';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
-import { initDB } from './db/connection.js';
+import { initDB, getPool } from './db/connection.js';
 
 // Routes
 import authRoutes from './routes/auth.js';
@@ -17,19 +17,26 @@ dotenv.config();
 
 const app = express();
 
-// Health check
-app.get('/health', (req, res) => {
+// Health check with DB connectivity
+app.get('/health', async (req, res) => {
   try {
-    res.status(200).json({ status: 'ok' });
+    const pool = getPool();
+    let db = { ok: false };
+    try {
+      const [rows] = await pool.query('SELECT 1 AS ok');
+      db = { ok: rows && rows[0] && rows[0].ok === 1 };
+    } catch (e) {
+      db = { ok: false, error: 'db_unreachable' };
+    }
+    res.status(200).json({ status: 'ok', db });
   } catch (err) {
     res.status(500).json({ status: 'error', error: String(err) });
   }
 });
 
 // Middleware
-const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || '*';
 app.use(helmet());
-app.use(cors({ origin: FRONTEND_ORIGIN === '*' ? true : FRONTEND_ORIGIN, credentials: true }));
+app.use(cors({ origin: "https://vedamed.netlify.app", credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -58,6 +65,14 @@ const PORT = process.env.PORT || 5000;
       console.warn('[WARN] DB not initialized at startup; API endpoints involving DB may fail until resolved.');
     } else {
       console.log('✅ Database connected successfully');
+    }
+    // Proactive DB ping for clearer logs
+    try {
+      const pool = getPool();
+      await pool.query('SELECT 1');
+      console.log('✅ DB ping successful');
+    } catch (e) {
+      console.error('❌ DB ping failed at startup');
     }
   });
 })();

@@ -2,7 +2,7 @@
 import jwt from 'jsonwebtoken';
 
 export const auth = (req, res, next) => {
-  const cookieToken = req.cookies?.access_token;
+  const cookieToken = req.cookies?.token;
   const authHeader = req.headers.authorization || '';
   const bearer = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
   const token = cookieToken || bearer;

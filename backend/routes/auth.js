@@ -2,7 +2,8 @@
 import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
 import { body, validationResult } from 'express-validator';
-import { signup, verify, login, resendOtp } from '../controllers/authController.js';
+import { signup, verify, login, resendOtp, me, logout } from '../controllers/authController.js';
+import { auth } from '../middleware/auth.js';
 
 const router = Router();
 
@@ -22,5 +23,7 @@ router.post('/api/auth/signup', emailValidator, passwordValidator, validate, sig
 router.post('/api/auth/verify', limiterTight, emailValidator, otpValidator, validate, verify);
 router.post('/api/auth/login', emailValidator, passwordValidator, validate, login);
 router.post('/api/auth/resend-otp', limiterTight, emailValidator, validate, resendOtp);
+router.get('/api/auth/me', auth, me);
+router.post('/api/auth/logout', logout);
 
 export default router;

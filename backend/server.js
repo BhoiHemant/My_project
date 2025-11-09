@@ -16,6 +16,8 @@ import billingRoutes from './routes/billing.js';
 dotenv.config();
 
 const app = express();
+// Behind Render/Proxies: trust first proxy so secure cookies are honored
+app.set('trust proxy', 1);
 
 // Health check with DB connectivity
 app.get('/health', async (req, res) => {
